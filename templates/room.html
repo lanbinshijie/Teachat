@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Room</title>
+    <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+<body>
+    <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
+        <div class="container">
+            <a href="#" class="navbar-brand">Teachat - 临时聊天软件</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navmenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">恢复聊天</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">注册/登录</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="body container" style="margin-top: 114px;">
+        <div class="card">
+            <div class="card-header">
+                <h2>Welcome to Room {{ roomID }}</h2>
+            </div>
+            <div class="card-body" style="display: flex; flex-direction: column; height: 520px;">
+                <div id="chat" style="flex-grow: 1; overflow-y: auto; margin-bottom: 20px; padding: 10px; border: 1px solid #dee2e6; border-radius: 5px; background-color: #f8f9fa;">
+                    <!-- Messages will be displayed here -->
+                </div>
+                <div class="input-group">
+                    <input type="text" id="message" class="form-control" placeholder="Type a message...">
+                    <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+                </div>
+                <p class="mt-2">当前人数：<span id="occ">0</span>人， 房间限额：<span id="lim">2</span>人； <button class="btn btn-danger" onclick="clearLocalStorage()">清除聊天记录</button></p>
+            </div>
+        </div>
+    </div>
+        <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        var roomID = "{{ roomID }}";
+        var username = "{{ userName }}";
+
+        socket.on('connect', function() {
+            socket.emit('join', {username: username, room: roomID});
+        });
+
+        socket.on('message', function(data) {
+            var chat = document.getElementById('chat');
+            chat.innerHTML += data + '<br>';
+            // Save messages to localStorage
+            localStorage.setItem(roomID, chat.innerHTML);
+        });
+
+        socket.on('update', function(data) {
+            // 拆包，拆除data，分为key和value
+            var key = Object.keys(data)[0];
+            var value = data[key];
+            if (key === 'occ') {
+                document.getElementById('occ').innerHTML = value;
+            } else if (key === 'lim') {
+                document.getElementById('lim').innerHTML = value;
+            }
+        })
+
+        window.onbeforeunload = function(e) {
+            socket.emit('leave', {username: username, room: roomID});
+        };
+
+        function sendMessage() {
+            var message = document.getElementById('message').value;
+            if (message.trim() !== '') {
+                socket.emit('message', {msg: username + ": " + message, room: roomID});
+                document.getElementById('message').value = '';
+            }
+        }
+
+        // Add an event listener for the Enter key in the message input field
+        document.getElementById('message').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent the default action of the Enter key
+                sendMessage(); // Call the sendMessage function
+            }
+        });
+
+        function clearLocalStorage() {
+            localStorage.removeItem(roomID);
+            document.getElementById('chat').innerHTML = '';
+        }
+
+        // Load chat history from localStorage
+        if(localStorage.getItem(roomID)) {
+            document.getElementById('chat').innerHTML = localStorage.getItem(roomID);
+        }
+    </script>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+</html>

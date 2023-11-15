@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Join a Chat Room</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+<body>
+    <nav class="navbar navbar-expand-md bg-dark navbar-dark fixed-top">
+        <div class="container">
+            <a href="#" class="navbar-brand">Teachat - 临时聊天软件</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navmenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">主页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">恢复聊天</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">注册/登录</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="body container" style="margin-top: 114px;">
+        <div class="card mt-5">
+            <div class="card-body">
+                <h1>Join a Chat Room</h1>
+                <form action="" method="get">
+                    <div class="mb-3">
+                        <label for="roomID" class="form-label">Enter Room ID:</label>
+                        <input type="text" class="form-control" id="roomID" name="roomID" required aria-describedby="roomIDHelp">
+                        <div id="roomIDHelp" class="form-text">Please enter the ID of the room you wish to join.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userName" class="form-label">Enter Your Name:</label>
+                        <input type="text" class="form-control" id="userName" name="userName" required aria-describedby="userNameHelp">
+                        <div id="userNameHelp" class="form-text">Please let your friend know who you are.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Join Room</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.querySelector('form').onsubmit = function(e) {
+            e.preventDefault();
+            var roomID = document.getElementById('roomID').value;
+            var userName = document.getElementById('userName').value;
+            window.location = '/room/' + roomID + '/' + userName;
+        }
+
+        // 函数用于生成一个随机的8位小写字母数字混合字符
+        function generateRoomCode() {
+            // 只要8位
+            return Math.random().toString(36).substr(2, 8);
+        }
+        // 设置roomID的默认value为随机生成的roomID
+        document.getElementById('roomID').value = generateRoomCode();
+    </script>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</html>
